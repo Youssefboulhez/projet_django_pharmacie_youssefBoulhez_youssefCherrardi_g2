@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Supprimer l'utilisateur</h2>
+    <div class="alert alert-danger">
+        ⚠️ Êtes-vous sûr de vouloir supprimer <strong>{{ target_user.username }}</strong> ?
+        Cette action est irréversible !
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🗑️ Confirmer la suppression</button>
+        <a href="{% url 'dashboard:manage_users' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

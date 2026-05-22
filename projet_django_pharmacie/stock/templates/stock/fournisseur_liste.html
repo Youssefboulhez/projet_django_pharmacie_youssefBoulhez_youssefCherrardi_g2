@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Fournisseurs - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-truck"></i> Fournisseurs</h1>
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'stock:ajouter_fournisseur' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Ajouter
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Code</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Contact</th>
+                            <th>Ville</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in fournisseurs %}
+                        <tr>
+                            <td>{{ f.code_fournisseur }}</td>
+                            <td><strong>{{ f.nom }}</strong></td>
+                            <td>{{ f.email }}</td>
+                            <td>{{ f.telephone }}</td>
+                            <td>{{ f.contact_nom }}</td>
+                            <td>{{ f.ville }}</td>
+                            <td>
+                                {% if user.profile.role == 'admin' %}
+                                <a href="{% url 'stock:modifier_fournisseur' f.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'stock:supprimer_fournisseur' f.id %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'stock:email_fournisseur' f.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun fournisseur enregistré</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

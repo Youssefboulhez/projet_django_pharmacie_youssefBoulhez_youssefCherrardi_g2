@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bienvenue - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5" style="background: linear-gradient(135deg, #042633ff, #1d4c5dff); color: white; border-radius: 15px; margin-bottom: 50px;">
+    <div class="container">
+        <h1 class="display-4 mb-4">Bienvenue à la Pharmacie H.I.B</h1>
+        <p class="lead mb-4">Votre santé, notre priorité. Découvrez notre large gamme de médicaments et produits de santé.</p>
+        
+        {% if not user.is_authenticated %}
+        <!-- Carrousel de médicaments -->
+        {% if medicaments %}
+        <div class="carousel-section mb-5">
+            <div id="medicamentsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-inner">
+                    {% for medicament in medicaments %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="d-flex justify-content-center align-items-center" style="height: 400px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                            {% if medicament.image %}
+                                <img src="{{ medicament.image.url }}" alt="{{ medicament.nom }}" 
+                                     style="max-height: 300px; max-width: 300px; object-fit: contain;">
+                            {% else %}
+                                <i class="fas fa-capsules fa-5x text-white opacity-50"></i>
+                            {% endif %}
+                        </div>
+                        <div class="mt-3">
+                            <h4 class="text-white fw-bold">{{ medicament.nom }}</h4>
+                            <p class="text-white-50">{{ medicament.dosage }} {{ medicament.forme }}</p>
+                            <p class="text-success fw-bold" style="font-size: 1.3rem;">{{ medicament.prix_vente }} DH</p>
+                            <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-shopping-cart"></i> Voir nos produits
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Contrôles du carrousel -->
+                {% if medicaments|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#medicamentsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#medicamentsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-success">
+            <h4>✅ Connecté en tant que {{ user.profile.get_role_display }}</h4>
+            <p>Vous serez redirigé vers votre tableau de bord.</p>
+            <a href="{% url 'logout' %}" class="btn btn-outline-light">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-pills fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Catalogue Complet</h5>
+                    <p class="card-text">Découvrez notre large sélection de médicaments et produits de santé.</p>
+                    <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-primary">Voir le catalogue</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Recherche Avancée</h5>
+                    <p class="card-text">Trouvez rapidement le médicament dont vous avez besoin.</p>
+                    <a href="{% url 'stock:recherche' %}" class="btn btn-success">Rechercher</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-cart fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Commande en Ligne</h5>
+                    <p class="card-text">Commandez vos médicaments en ligne et faites-les livrer.</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'ventes:panier' %}" class="btn btn-warning">Mon panier</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-warning">S'inscrire</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .carousel-item {
+        transition: all 0.5s ease;
+    }
+    
+    .carousel-section {
+        animation: slideIn 0.5s ease-in-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

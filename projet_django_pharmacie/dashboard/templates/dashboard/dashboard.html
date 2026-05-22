@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">📊 Tableau de bord</h1>
+    
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Médicaments</h5>
+                    <h2 class="display-4">{{ total_medicaments }}</h2>
+                    <p>en catalogue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title"> Stock critique</h5>
+                    <h2 class="display-4">{{ medicaments_critique }}</h2>
+                    <p>médicaments sous seuil</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title"> Rupture</h5>
+                    <h2 class="display-4">{{ medicaments_rupture }}</h2>
+                    <p>médicaments en rupture</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title"> Expirés</h5>
+                    <h2 class="display-4">{{ medicaments_expires }}</h2>
+                    <p>médicaments expirés</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actions administrateur -->
+    {% if user.profile.role == 'admin' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> Actions Administrateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'stock:verifier_disponibilite' %}" class="btn btn-warning w-100">
+                                <i class="fas fa-search"></i> Vérifier Disponibilité
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'stock:liste_fournisseurs' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-truck"></i> Gérer Fournisseurs
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'dashboard:manage_users' %}" class="btn btn-success w-100">
+                                <i class="fas fa-users"></i> Gérer Utilisateurs
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/" class="btn btn-secondary w-100">
+                                <i class="fas fa-cog"></i> Admin Django
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Chiffre d'affaires -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"> Chiffre d'affaires</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h6>Aujourd'hui</h6>
+                            <h3 class="text-success">{{ ca_aujourdhui|floatformat:2 }} DH</h3>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h6>Cette semaine</h6>
+                            <h3 class="text-success">{{ ca_semaine|floatformat:2 }} DH</h3>
+                        </div>
+                        <div class="col-6 text-center mt-3">
+                            <h6>Ce mois</h6>
+                            <h3 class="text-success">{{ ca_mois|floatformat:2 }} DH</h3>
+                        </div>
+                        <div class="col-6 text-center mt-3">
+                            <h6>Total</h6>
+                            <h3 class="text-success">{{ ca_total|floatformat:2 }} DH</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Évolution des ventes (7 jours)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ventesChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top médicaments -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">🏆 Top 5 médicaments vendus</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Médicament</th>
+                                <th>Quantité vendue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in top_medicaments %}
+                            <tr>
+                                <td>{{ med.medicament__nom }}</td>
+                                <td>{{ med.total_quantite }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">Aucune vente enregistrée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📊 Résumé des ventes</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>{{ total_ventes }}</h3>
+                            <p>Total commandes</p>
+                        </div>
+                        <div class="col-6">
+                            <h3>{{ ventes_aujourdhui }}</h3>
+                            <p>Commandes aujourd'hui</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Nouvelles cartes -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white card-stats">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Utilisateurs</h5>
+                        <h2 class="display-4">{{ total_utilisateurs }}</h2>
+                        <small>actifs</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white card-stats">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>Croissance</h5>
+                        <h2 class="display-4">+{{ croissance_ventes }}%</h2>
+                        <small>vs mois dernier</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activités récentes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📋 Activités récentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date & Heure</th>
+                                <th>Activité</th>
+                                <th>Utilisateur</th>
+                                <th>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activite in activites_recentes %}
+                            <tr>
+                                <td>{{ activite.date|date:"d/m/Y H:i" }}</td>
+                                <td>{{ activite.action }}</td>
+                                <td>{{ activite.user }}</td>
+                                <td>{{ activite.details }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+  <!-- Lien vers la gestion des alertes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-bell"></i>
+            <strong>Alertes :</strong>
+            {% if medicaments_critique > 0 %}
+                {{ medicaments_critique }} médicament(s) en stock critique.
+            {% else %}
+                Aucune alerte à signaler.
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js pour les graphiques -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('ventesChart').getContext('2d');
+    const ventesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [{% for jour in ventes_par_jour %}'{{ jour.jour }}',{% endfor %}],
+            datasets: [{
+                label: 'CA (DH)',
+                data: [{% for jour in ventes_par_jour %}{{ jour.total }},{% endfor %}],
+                backgroundColor: 'rgba(8, 20, 28, 0.2)',
+                borderColor: 'rgba(20, 45, 15, 1)',
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Chiffre d\'affaires par jour'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

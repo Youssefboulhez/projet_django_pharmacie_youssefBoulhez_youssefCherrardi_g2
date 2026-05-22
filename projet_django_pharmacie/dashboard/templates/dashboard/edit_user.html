@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Modifier l'utilisateur : {{ target_user.username }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" name="username" value="{{ target_user.username }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ target_user.email }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Téléphone</label>
+            <input type="text" name="telephone" value="{{ target_user.profile.telephone }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Rôle</label>
+            <select name="role" class="form-control">
+                <option value="client" {% if target_user.profile.role == 'client' %}selected{% endif %}>Client</option>
+                <option value="pharmacien" {% if target_user.profile.role == 'pharmacien' %}selected{% endif %}>Pharmacien</option>
+                <option value="admin" {% if target_user.profile.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Sauvegarder</button>
+        <a href="{% url 'dashboard:manage_users' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

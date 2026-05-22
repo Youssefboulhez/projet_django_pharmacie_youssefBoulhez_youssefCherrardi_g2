@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À propos - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-2">À propos de nous</h1>
+        <p class="lead text-muted">Découvrez nos valeurs et nos engagements envers vous</p>
+    </div>
+
+    <!-- Nos valeurs -->
+    <div class="mb-5">
+        <h2 class="text-center mb-4 fw-bold">Nos valeurs</h2>
+        <p class="text-center text-muted mb-5">au cœur de chaque service</p>
+        
+        <div class="row">
+            <!-- Le bien-être de nos clients -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #C8E6C9; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-smile fa-3x text-success"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Le bien-être de nos clients</h5>
+                        <p class="card-text text-muted">Nos clients peuvent se faire livrer à leur domicile ou celui d'un proche, voire même à leur lieu de travail.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Livreurs responsables -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #F8BBD0; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-clipboard-check fa-3x" style="color: #E91E63;"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Livreurs responsables</h5>
+                        <p class="card-text text-muted">Nous recrutons avec soin les livreurs chez Daway, car nous avons conscience de l'importance des produits transportés.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Une aide aux pharmacies -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #B2EBF2; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-users fa-3x text-info"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Une aide aux pharmacies</h5>
+                        <p class="card-text text-muted">Nos pharmacies partenaires auront ainsi accès à une nouvelle clientèle, présente sur notre application.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaction et conseil -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #FFF9C4; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-question-circle fa-3x" style="color: #FBC02D;"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Interaction et conseil</h5>
+                        <p class="card-text text-muted">Notre service a pour objectif de conserver le contact entre le pharmacien et le client.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temps réel -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #E1F5FE; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-hourglass-end fa-3x text-primary"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Temps réel</h5>
+                        <p class="card-text text-muted">Suivez votre livraison en temps réel. Les utilisateurs peuvent suivre toutes les étapes de la livraison.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Livrer 7/7 et 24/24 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <div style="background: #F0F4C3; width: 80px; height: 80px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-truck fa-3x" style="color: #9CCC65;"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Livrer 7/7 et 24/24</h5>
+                        <p class="card-text text-muted">Aucune interruption de service ! Le Click & Collect garantit l'accès 24h/7j aux pharmacies de garde. Livraison parapharmarie disponible: express — 7j/7.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description supplémentaire -->
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm rounded-4 p-4" style="background: linear-gradient(135deg, #e8f5e9, #e3f2fd);">
+                <h3 class="fw-bold mb-3">Qui sommes-nous ?</h3>
+                <p class="text-muted mb-3">
+                    Pharmacie H.I.B est une plateforme innovante de vente et de gestion de médicaments en ligne. 
+                    Nous nous engageons à faciliter l'accès aux médicaments de qualité tout en maintenant un service 
+                    professionnel et attentionné.
+                </p>
+                <p class="text-muted">
+                    Notre application connecte les pharmacies avec leurs clients, offrant une expérience transparente 
+                    et sécurisée pour l'achat de médicaments, avec la possibilité de consulter les pharmaciens et de 
+                    bénéficier d'une livraison rapide et fiable.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="row mt-5 text-center">
+        <div class="col-12">
+            <h3 class="fw-bold mb-4">Nous contacter</h3>
+            <p class="text-muted mb-4">
+                Vous avez des questions ou des suggestions ? N'hésitez pas à nous contacter.
+            </p>
+            <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-primary btn-lg rounded-pill">
+                <i class="fas fa-arrow-left"></i> Retour au catalogue
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+</style>
+{% endblock %}

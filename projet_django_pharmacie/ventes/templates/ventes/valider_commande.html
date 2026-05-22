@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Validation de Commande - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-check-circle"></i> Validation de votre commande</h3>
+                </div>
+                <div class="card-body">
+                    <h5>Récapitulatif de votre commande :</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Médicament</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                <tr>
+                                    <td>{{ article.medicament.nom }}</td>
+                                    <td>{{ article.quantite }}</td>
+                                    <td>{{ article.medicament.prix_vente|floatformat:2 }} DH</td>
+                                    <td>{{ article.sous_total|floatformat:2 }} DH</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <th colspan="3">TOTAL</th>
+                                    <th>{{ total|floatformat:2 }} DH</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <h5>Choisissez votre mode de paiement :</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="mode_paiement" id="carte" value="carte" checked>
+                                <label class="form-check-label" for="carte">
+                                    <i class="fas fa-credit-card"></i> <strong>Paiement par carte bancaire</strong>
+                                    <br><small class="text-muted">Paiement sécurisé immédiat. Votre commande sera traitée immédiatement.</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="mode_paiement" id="livraison" value="livraison">
+                                <label class="form-check-label" for="livraison">
+                                    <i class="fas fa-truck"></i> <strong>Paiement à la livraison</strong>
+                                    <br><small class="text-muted">Payez en espèces ou par carte lors de la réception de votre commande.</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Informations importantes :</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>La livraison est gratuite pour toute commande supérieure à 200 DH</li>
+                                <li>Délai de livraison : 24-48h pour Casablanca, 2-3 jours pour les autres villes</li>
+                                <li>Un email de confirmation vous sera envoyé avec la facture</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'ventes:panier' %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Retour au panier
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Confirmer la commande
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon panier{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🛒 Mon panier</h1>
+    
+    {% if articles %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Médicament</th>
+                    <th>Prix unitaire</th>
+                    <th>Quantité</th>
+                    <th>Sous-total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td>{{ article.medicament.nom }}</td>
+                    <td>{{ article.medicament.prix_vente }} DH</td>
+                    <td>{{ article.quantite }}</td>
+                    <td>{{ article.sous_total }} DH</td>
+                    <td>
+                        <a href="{% url 'ventes:retirer' article.medicament.id %}" class="btn btn-sm btn-danger">
+                            Retirer
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Total</strong></td>
+                    <td colspan="2"><strong>{{ total }} DH</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+    <div class="text-end">
+        <a href="{% url 'ventes:valider' %}" class="btn btn-success">Valider la commande</a>
+    </div>
+    {% else %}
+    <div class="alert alert-info">Votre panier est vide</div>
+    {% endif %}
+</div>
+{% endblock %}

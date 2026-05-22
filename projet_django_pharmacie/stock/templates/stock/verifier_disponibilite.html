@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Vérification Disponibilité - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-search"></i> Vérification de Disponibilité</h2>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au Dashboard
+        </a>
+    </div>
+
+    {% if total_problemes == 0 %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Tous les médicaments sont disponibles en stock !
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> {{ total_problemes }} médicament(s) nécessitent une vérification
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-check-circle"></i> Produits disponibles</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if medicaments_disponibles %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Code Barre</th>
+                                        <th>Stock</th>
+                                        <th>Seuil</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_disponibles %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td>{{ med.code_barre }}</td>
+                                        <td>{{ med.quantite_stock }}</td>
+                                        <td>{{ med.seuil_alerte }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            Aucun produit disponible.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-times-circle"></i> Produits indisponibles</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if medicaments_indisponibles %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Code Barre</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_indisponibles %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td>{{ med.code_barre }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ med.quantite_stock }}</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            Aucun produit indisponible.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Médicaments nécessitant une réapprovisionnement</h5>
+        </div>
+        <div class="card-body">
+            {% if medicaments_problematiques %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Médicament</th>
+                                <th>Code Barre</th>
+                                <th>Stock Actuel</th>
+                                <th>Seuil Alerte</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in medicaments_problematiques %}
+                            <tr>
+                                <td>{{ med.nom }}</td>
+                                <td>{{ med.code_barre }}</td>
+                                <td>
+                                    {% if med.quantite_stock == 0 %}
+                                        <span class="badge bg-danger">Rupture</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ med.quantite_stock }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ med.seuil_alerte }}</td>
+                                <td>
+                                    {% if med.quantite_stock == 0 %}
+                                        <span class="badge bg-danger">Rupture</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Critique</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sync"></i> Rafraîchir l'état
+                        </button>
+                        <p class="text-muted mt-2">
+                            <small>Cette action recharge simplement la page de disponibilité.</small>
+                        </p>
+                    </form>
+                </div>
+            {% else %}
+                <p class="text-muted">Aucun médicament ne nécessite de réapprovisionnement.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
