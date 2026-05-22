@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer un médicament{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">⚠️ Confirmation</h2>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fs-4">
+                        Êtes-vous sûr de vouloir supprimer ?
+                    </p>
+                    <p class="fw-bold text-danger">
+                        "{{ medicament.nom }}"
+                    </p>
+                    <p class="text-muted">
+                        Code: {{ medicament.code_barre }}
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                ✓ Confirmer suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

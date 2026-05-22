@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Liste des médicaments{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Catalogue des médicaments</h1>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="card shadow-sm mb-4 border-0" style="background: linear-gradient(135deg, #e8f5e9, #e3f2fd);">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <label for="recherche" class="form-label fw-bold">🔍 Recherche</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="recherche" name="q"
+                               value="{{ recherche }}" placeholder="Nom du médicament ou maladie...">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end justify-content-end">
+                    <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Grille des médicaments -->
+    <div class="mb-3">
+        <p class="text-muted">
+            <i class="fas fa-info-circle"></i> 
+            {% if recherche or forme_filter %}
+                {{ medicaments|length }} médicament{{ medicaments|length|pluralize }} trouvé{{ medicaments|length|pluralize }} 
+                {% if recherche %}pour "{{ recherche }}"{% endif %}
+                {% if forme_filter %}en forme "{{ forme_filter }}"{% endif %}
+            {% else %}
+                {{ medicaments|length }} médicament{{ medicaments|length|pluralize }} disponible{{ medicaments|length|pluralize }}
+            {% endif %}
+        </p>
+    </div>
+    <div class="row" id="medicamentsGrid">
+        {% for medicament in medicaments %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 product-card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    {% if medicament.image %}
+                        <img src="{{ medicament.image.url }}" alt="{{ medicament.nom }}"
+                             style="height: 120px; width: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">
+                    {% else %}
+                        <i class="fas fa-capsules fa-5x text-primary mb-3"></i>
+                    {% endif %}
+                    <h6 class="card-title mb-2">{{ medicament.nom|truncatechars:30 }}</h6>
+                    <p class="text-muted small mb-2">{{ medicament.dosage }} {{ medicament.forme }}</p>
+                    <p class="text-success fw-bold mb-2">{{ medicament.prix_vente }} DH</p>
+                    <p class="small text-muted mb-3">
+                        {% if medicament.quantite_stock > 0 %}
+                            <span class="text-success">✓ En stock ({{ medicament.quantite_stock }})</span>
+                        {% else %}
+                            <span class="text-danger">✗ Rupture de stock</span>
+                        {% endif %}
+                    </p>
+                    <div class="d-grid">
+                        {% if user.is_authenticated %}
+                            {% if user.profile.role == 'client' %}
+                                {% if medicament.quantite_stock > 0 %}
+                                    <a href="{% url 'ventes:ajouter' medicament.id %}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-cart-plus"></i> Ajouter au panier
+                                    </a>
+                                {% else %}
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-ban"></i> Indisponible
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-shopping-cart"></i> Voir le catalogue
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-shopping-cart"></i> Se connecter pour acheter
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-capsules fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Aucun médicament disponible</h4>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'stock:ajouter' %}" class="btn btn-primary">Ajouter un médicament</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.product-card img {
+    transition: transform 0.2s ease-in-out;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+</style>
+{% endblock %}

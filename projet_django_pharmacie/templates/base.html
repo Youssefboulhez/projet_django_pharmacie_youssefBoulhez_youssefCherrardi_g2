@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacie H.I.B - {% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    {% load static %}
+    <!-- Styles personnalisés -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        :root {
+            --primary-color: #042633ff;
+            --secondary-color: #042633ff;
+            --accent-color: #e62236ff;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #f8f9fa;
+        }
+        
+        /* Header top - barre d'info */
+        .header-top {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        
+        .header-top a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: opacity 0.3s;
+        }
+        
+        .header-top a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Navbar */
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .bg-pharmacy {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Catégories */
+        .categories-bar {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        
+        .categories-bar .nav-link {
+            color: var(--dark);
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+        
+        /* Cartes produits */
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .product-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .product-card .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+        
+        .product-card .old-price {
+            font-size: 0.85rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .product-card .promo-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Boutons */
+        .btn-cart {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 25px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-cart:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+        
+        .btn-outline-cart {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 25px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-cart:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Footer amélioré */
+        .footer {
+            background: #042633ff;
+            color: #aaa;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer h5 {
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            background: #1a563dff;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+        
+        /* Badges stock */
+        .badge-stock {
+            background: var(--success-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        
+        .badge-low {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .badge-critical {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-top {
+                font-size: 11px;
+            }
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            .product-card .card-img-top {
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+  
+    <!-- Navbar principale -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-pharmacy sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'stock:liste_medicaments' %}">
+                <img src="{% static 'images/image.png' %}" alt="H.I.B">
+                Pharmacie H.I.B
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'stock:liste_medicaments' %}">
+                            <i class="fas fa-list"></i> Catalogue
+                        </a>
+                    </li>
+                    {% if user.is_authenticated and user.profile.role == 'client' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'ventes:panier' %}">
+                                <i class="fas fa-shopping-cart"></i> Panier
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'stock:about' %}">
+                            <i class="fas fa-info-circle"></i> À propos
+                        </a>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user.profile.role == 'pharmacien' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'stock:alertes' %}">
+                                    <i class="fas fa-exclamation-triangle"></i> Alertes
+                                    {% if total_alertes %}
+                                        <span class="badge bg-danger">{{ total_alertes }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% if user.profile.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'dashboard:index' %}">
+                                    <i class="fas fa-chart-line"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'stock:liste_fournisseurs' %}">
+                                    <i class="fas fa-truck"></i> Fournisseurs
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> {{ user.username }}
+                                <span class="badge bg-secondary">{{ user.profile.get_role_display }}</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                                    <i class="fas fa-id-card"></i> Mon profil
+                                </a></li>
+                                {% if user.profile.role == 'client' %}
+                                    <li><a class="dropdown-item" href="{% url 'ventes:historique' %}">
+                                        <i class="fas fa-history"></i> Mes commandes
+                                    </a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i> Connexion
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">
+                                <i class="fas fa-user-plus"></i> Inscription
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+    </div>
+
+    <main class="container mt-4">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer amélioré -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-map-marker-alt"></i> Pharmacie H.I.B</h5>
+                    <p>123 Avenue Mohammed V<br>
+                    Casablanca, Maroc<br>
+                    <i class="fas fa-phone"></i> 05 22 00 00 00<br>
+                    <i class="fas fa-envelope"></i> contact@pharmacie-hib.ma</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Liens rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'stock:liste_medicaments' %}">Catalogue</a></li>
+                        <li><a href="{% url 'stock:recherche' %}">Recherche</a></li>
+                        <li><a href="{% url 'ventes:panier' %}">Panier</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Informations</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Livraison</a></li>
+                        <li><a href="#">Paiement sécurisé</a></li>
+                        <li><a href="#">Confidentialité</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Suivez-nous</h5>
+                    <div class="social-links">
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="mt-3">
+                        <img src="{% static 'images/paiement.png' %}" alt="Paiement sécurisé" style="height: 40px;" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container text-center">
+                <p class="mb-0">&copy; 2026 - Pharmacie H.I.B | Tous droits réservés | Site réalisé avec <i class="fas fa-heart text-danger"></i> pour votre santé</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" class="btn btn-primary rounded-circle" style="position: fixed; bottom: 20px; right: 20px; display: none; width: 45px; height: 45px; border-radius: 50%;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <script>
+        // Scroll to top
+        const scrollBtn = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollBtn.style.display = 'block';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

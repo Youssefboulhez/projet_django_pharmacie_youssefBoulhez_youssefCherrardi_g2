@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Facture {{ vente.numero_facture }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h2><i class="fas fa-receipt"></i> Facture {{ vente.numero_facture }}</h2>
+                    <p class="mb-0">Commande validée le {{ vente.date_vente|date:"d/m/Y à H:i" }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> Informations client</h5>
+                            <p><strong>Nom:</strong> {{ vente.utilisateur.get_full_name|default:vente.utilisateur.username }}</p>
+                            <p><strong>Email:</strong> {{ vente.utilisateur.email }}</p>
+                            <p><strong>Téléphone:</strong> {{ vente.utilisateur.profile.telephone|default:"Non renseigné" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-info-circle"></i> Détails de la commande</h5>
+                            <p><strong>Numéro de facture:</strong> {{ vente.numero_facture }}</p>
+                            <p><strong>Date:</strong> {{ vente.date_vente|date:"d/m/Y à H:i" }}</p>
+                            <p><strong>Statut:</strong> 
+                                {% if vente.statut == 'terminee' %}
+                                    <span class="badge bg-success">Terminée</span>
+                                {% elif vente.statut == 'en_cours' %}
+                                    <span class="badge bg-warning">En cours</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ vente.get_statut_display }}</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Mode de paiement:</strong> 
+                                {% if vente.mode_paiement == 'carte' %}
+                                    <span class="badge bg-primary"><i class="fas fa-credit-card"></i> Carte bancaire</span>
+                                {% elif vente.mode_paiement == 'livraison' %}
+                                    <span class="badge bg-info"><i class="fas fa-truck"></i> À la livraison</span>
+                                {% elif vente.mode_paiement == 'effectue' %}
+                                    <span class="badge bg-success"><i class="fas fa-check"></i> Effectué</span>
+                                {% else %}
+                                    <span class="badge bg-secondary"><i class="fas fa-clock"></i> En attente</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <h5><i class="fas fa-list"></i> Articles commandés</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Médicament</th>
+                                    <th>Code</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in vente.details.all %}
+                                <tr>
+                                    <td>{{ detail.medicament.nom }}</td>
+                                    <td>{{ detail.medicament.code_barre }}</td>
+                                    <td>{{ detail.quantite }}</td>
+                                    <td>{{ detail.prix_unitaire|floatformat:2 }} DH</td>
+                                    <td>{{ detail.sous_total|floatformat:2 }} DH</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-dark">
+                                <tr>
+                                    <th colspan="4">TOTAL TTC</th>
+                                    <th>{{ vente.total_ttc|floatformat:2 }} DH</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    {% if vente.mode_paiement == 'livraison' %}
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Paiement à la livraison:</strong> Vous pourrez payer en espèces ou par carte bancaire lors de la réception de votre commande.
+                    </div>
+                    {% elif vente.mode_paiement == 'carte' %}
+                    <div class="alert alert-success mt-4">
+                        <i class="fas fa-check-circle"></i> 
+                        <strong>Paiement effectué:</strong> Votre paiement par carte bancaire a été accepté.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'ventes:facture_pdf' vente.id %}" class="btn btn-danger me-2">
+                        <i class="fas fa-file-pdf"></i> Télécharger PDF
+                    </a>
+                    <a href="{% url 'ventes:historique' %}" class="btn btn-info me-2">
+                        <i class="fas fa-history"></i> Mes commandes
+                    </a>
+                    <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Continuer mes achats
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

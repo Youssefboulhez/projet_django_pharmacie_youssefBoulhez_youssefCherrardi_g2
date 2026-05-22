@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Alertes Stock - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-exclamation-triangle text-warning"></i> Alertes Automatiques du Stock</h2>
+        <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au catalogue
+        </a>
+    </div>
+
+    {% if total_alertes == 0 %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Aucun problème détecté dans le stock !
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> {{ total_alertes }} alerte(s) détectée(s)
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Rupture de stock -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-times-circle"></i> Rupture de Stock ({{ medicaments_rupture.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicaments_rupture %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Code</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_rupture %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td>{{ med.code_barre }}</td>
+                                        <td>
+                                            <a href="{% url 'stock:modifier' med.pk %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> Modifier
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucun médicament en rupture.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock critique -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Stock Critique ({{ medicaments_critique.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicaments_critique %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Stock</th>
+                                        <th>Seuil</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_critique %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td><span class="badge bg-danger">{{ med.quantite_stock }}</span></td>
+                                        <td>{{ med.seuil_alerte }}</td>
+                                        <td>
+                                            <a href="{% url 'stock:modifier' med.pk %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> Modifier
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucun médicament en stock critique.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Expiration proche -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-times"></i> Expiration dans 30 jours ({{ medicaments_expirant.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicaments_expirant %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Expiration</th>
+                                        <th>Jours restants</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_expirant %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td>{{ med.date_expiration|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% with jours=med.date_expiration|timeuntil %}
+                                                <span class="badge bg-warning">{{ jours }}</span>
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'stock:modifier' med.pk %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> Modifier
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucun médicament expirant bientôt.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Déjà expirés -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-dark">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-skull-crossbones"></i> Médicaments Expirés ({{ medicaments_expires.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicaments_expires %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Médicament</th>
+                                        <th>Expiration</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for med in medicaments_expires %}
+                                    <tr>
+                                        <td>{{ med.nom }}</td>
+                                        <td><span class="badge bg-danger">{{ med.date_expiration|date:"d/m/Y" }}</span></td>
+                                        <td>
+                                            <a href="{% url 'stock:modifier' med.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Supprimer
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucun médicament expiré.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5><i class="fas fa-bolt"></i> Actions Rapides</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="{% url 'stock:ajouter' %}" class="btn btn-success w-100">
+                        <i class="fas fa-plus"></i> Ajouter Produit
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'stock:liste_fournisseurs' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-truck"></i> Fournisseurs
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'dashboard:index' %}" class="btn btn-info w-100">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'ventes:caisse_pharmacien' %}" class="btn btn-warning w-100">
+                        <i class="fas fa-cash-register"></i> Caisse
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

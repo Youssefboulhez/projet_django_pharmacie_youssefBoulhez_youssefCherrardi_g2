@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Caisse Pharmacien - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Colonne gauche : Recherche et produits -->
+        <div class="col-md-7">
+            <!-- Barre de recherche -->
+            <div class="card shadow-sm mb-4 border-0" style="background: linear-gradient(135deg, #e8f5e9, #e3f2fd);">
+                <div class="card-body">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white border-0"><i class="fas fa-search text-primary"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-0 shadow-none" 
+                               placeholder="🔍 Rechercher par nom, code barre ou marque..."
+                               style="font-size: 1.1rem;">
+                        <button class="btn btn-primary px-4" onclick="searchProducts()">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Produits populaires -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-fire text-warning"></i> PRODUITS POPULAIRES</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="productsGrid">
+                        {% for produit in produits_populaires %}
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <div class="card h-100 product-card border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    {% if produit.image %}
+                                        <img src="{{ produit.image.url }}" alt="{{ produit.nom }}" 
+                                             style="height: 80px; width: 80px; object-fit: cover; border-radius: 10px;">
+                                    {% else %}
+                                        <i class="fas fa-capsules fa-4x text-primary mb-2"></i>
+                                    {% endif %}
+                                    <h6 class="card-title mt-2 mb-1">{{ produit.nom|truncatechars:25 }}</h6>
+                                    <p class="text-success fw-bold mb-2">{{ produit.prix_vente }} DH</p>
+                                    <p class="small text-muted mb-2">Stock: {{ produit.quantite_stock }}</p>
+                                    <div class="text-muted small">Consultation uniquement</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Résultats de recherche -->
+            <div id="searchResults" style="display: none;" class="mt-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-search text-primary"></i> Résultats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="searchResultsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne droite : Ventes du jour -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #e8f5e9, #e3f2fd);">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-calendar-day"></i> VENTES DU JOUR</h5>
+                    <small class="text-white-50">{{ date_jour|date:"d/m/Y" }}</small>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>FACTURE</th>
+                                    <th class="text-center">HEURE</th>
+                                    <th class="text-end">MONTANT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ventesJour">
+                                {% for vente in ventes_jour %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'ventes:facture' vente.id %}" class="text-decoration-none">
+                                            {{ vente.numero_facture }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">{{ vente.date_vente|time:"H:i" }}</td>
+                                    <td class="text-end">{{ vente.total_ttc }} DH</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                                        Aucune vente aujourd'hui
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">TOTAL DU JOUR :</h5>
+                        <h3 class="text-success mb-0" id="totalJour">{{ total_ventes_jour }} DH</h3>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-info btn-lg py-3 fw-bold" onclick="showRecentSales()">
+                            <i class="fas fa-history"></i> HISTORIQUE COMPLET
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .btn-outline-secondary.rounded-circle {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .card {
+        border-radius: 15px;
+    }
+    .btn-lg {
+        border-radius: 10px;
+    }
+</style>
+
+<script>
+    function addToCart(id) {
+        window.location.href = `/ventes/ajouter/${id}/`;
+    }
+    
+    function showRecentSales() {
+        window.location.href = "{% url 'ventes:historique_complet' %}";
+    }
+    
+    function searchProducts() {
+        let query = document.getElementById('searchInput').value;
+        if (query.length >= 2) {
+            window.location.href = "{% url 'stock:recherche' %}?q=" + encodeURIComponent(query);
+        }
+    }
+    
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchProducts();
+        }
+    });
+</script>
+
+<!-- Raccourcis clavier -->
+<script>
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F3') {
+            e.preventDefault();
+            validateSale();
+        }
+    });
+</script>
+{% endblock %}

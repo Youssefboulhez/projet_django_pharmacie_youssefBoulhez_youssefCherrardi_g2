@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h3><i class="fas fa-user-plus"></i> Inscription</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nom d'utilisateur</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe</label>
+                            {{ form.password1 }}
+                            <small class="text-muted">8 caractères minimum</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Confirmer mot de passe</label>
+                            {{ form.password2 }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone (optionnel)</label>
+                            {{ form.telephone }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Adresse (optionnel)</label>
+                            {{ form.adresse }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> S'inscrire
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

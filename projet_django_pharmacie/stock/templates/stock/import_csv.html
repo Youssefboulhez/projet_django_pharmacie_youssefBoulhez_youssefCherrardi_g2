@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Import CSV - Médicaments{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-file-import"></i> Importation CSV</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Format du fichier CSV attendu :</strong><br>
+                        <code>nom;code_barre;description;prix_achat;prix_vente;quantite_stock;seuil_alerte;date_expiration</code>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Fichier CSV</label>
+                            <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                            <small class="text-muted">UTF-8 avec séparateur point-virgule (;)</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'stock:export_csv' %}" class="btn btn-info">
+                                <i class="fas fa-file-export"></i> Exemple CSV
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload"></i> Importer
+                            </button>
+                            <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-download"></i> Export</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'stock:export_csv' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-file-csv"></i> Exporter en CSV
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'stock:export_excel' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-file-excel"></i> Exporter en Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

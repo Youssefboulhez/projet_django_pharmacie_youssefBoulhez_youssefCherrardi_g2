@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Recherche avancée de médicaments{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1><i class="fas fa-search"></i> Recherche avancée de médicaments</h1>
+    
+    <!-- Formulaire de recherche avancée -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Filtres de recherche</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'stock:recherche' %}" class="row g-3">
+                <div class="col-md-6">
+                    <label for="q" class="form-label">Recherche textuelle</label>
+                    <input type="text" 
+                           name="q" 
+                           id="q"
+                           class="form-control" 
+                           placeholder="Nom, code barre, description..."
+                           value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="prix_min" class="form-label">Prix minimum (DH)</label>
+                    <input type="number" 
+                           name="prix_min" 
+                           id="prix_min"
+                           class="form-control" 
+                           step="0.01"
+                           value="{{ prix_min }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="prix_max" class="form-label">Prix maximum (DH)</label>
+                    <input type="number" 
+                           name="prix_max" 
+                           id="prix_max"
+                           class="form-control" 
+                           step="0.01"
+                           value="{{ prix_max }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="en_stock" class="form-label">Disponibilité</label>
+                    <select name="en_stock" id="en_stock" class="form-select">
+                        <option value="">Tous les médicaments</option>
+                        <option value="oui" {% if en_stock == 'oui' %}selected{% endif %}>En stock uniquement</option>
+                        <option value="non" {% if en_stock == 'non' %}selected{% endif %}>Rupture de stock</option>
+                    </select>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                    <a href="{% url 'stock:recherche' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Résultats -->
+    {% if query or prix_min or prix_max or en_stock %}
+        <div class="alert alert-info">
+            <strong>{{ resultats }}</strong> résultat(s) trouvé(s)
+            {% if query %}pour "{{ query }}"{% endif %}
+        </div>
+    {% endif %}
+    
+    <!-- Liste des résultats -->
+    {% if medicaments %}
+    <div class="row">
+        {% for medicament in medicaments %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 product-card">
+                {% if medicament.image %}
+                    <img src="{{ medicament.image.url }}" class="card-img-top" alt="{{ medicament.nom }}">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-pills fa-3x text-muted"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ medicament.nom }}</h5>
+                    <p class="card-text text-muted small">{{ medicament.description|truncatechars:100 }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="price">{{ medicament.prix_vente|floatformat:2 }} DH</span>
+                            <small class="text-muted">Code: {{ medicament.code_barre }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            {% if medicament.quantite_stock > 0 %}
+                                <span class="badge-stock">En stock ({{ medicament.quantite_stock }})</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rupture</span>
+                            {% endif %}
+                            {% if medicament.date_expiration %}
+                                <small class="text-muted">Exp: {{ medicament.date_expiration|date:"d/m/Y" }}</small>
+                            {% endif %}
+                        </div>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'ventes:ajouter' medicament.id %}" class="btn btn-cart w-100">
+                                <i class="fas fa-cart-plus"></i> Ajouter au panier
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-cart w-100">
+                                <i class="fas fa-sign-in-alt"></i> Se connecter
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <h4>Aucun médicament trouvé</h4>
+        <p>Essayez de modifier vos critères de recherche.</p>
+        <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-primary">
+            <i class="fas fa-list"></i> Voir tous les médicaments
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+                    <td><strong>{{ medicament.nom }}</strong></td>
+                    <td>{{ medicament.code_barre }}</td>
+                    <td>{{ medicament.prix_vente }} DH</td>
+                    <td>
+                        {% if medicament.quantite_stock <= medicament.seuil_alerte %}
+                            <span class="text-danger fw-bold">
+                                ⚠️ {{ medicament.quantite_stock }}
+                            </span>
+                        {% else %}
+                            {{ medicament.quantite_stock }}
+                        {% endif %}
+                    </td>
+                    <td>{{ medicament.date_expiration|date:"d/m/Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        {% if query %}
+                            Aucun médicament trouvé pour "{{ query }}"
+                        {% else %}
+                            Entrez un terme de recherche
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Lien retour -->
+    <a href="{% url 'stock:liste_medicaments' %}" class="btn btn-secondary">
+        ← Retour à la liste complète
+    </a>
+</div>
+{% endblock %}

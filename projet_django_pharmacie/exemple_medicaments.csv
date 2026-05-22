@@ -1,0 +1,6 @@
+nom;code_barre;description;prix_achat;prix_vente;quantite_stock;seuil_alerte;date_expiration
+Paracétamol 500mg;1234567890123;Antidouleur et antipyrétique;2.50;4.90;50;10;2025-12-31
+Ibuprofène 400mg;1234567890124;Anti-inflammatoire non stéroïdien;3.00;5.50;40;10;2026-06-30
+Amoxicilline 500mg;1234567890125;Antibiotique à large spectre;5.00;9.80;30;10;2025-11-15
+Vitamine C 1000mg;1234567890126;Complément alimentaire;4.00;8.50;100;20;2027-01-15
+Oméprazole 20mg;1234567890127;Inhibiteur de la pompe à protons;6.00;12.90;25;5;2026-03-20

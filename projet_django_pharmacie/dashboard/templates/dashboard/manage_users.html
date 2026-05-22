@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gérer les utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">Gérer les utilisateurs</h1>
+            <p class="text-muted">Liste des utilisateurs connectés et actions administrateur.</p>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-check"></i> Utilisateurs connectés</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Email</th>
+                                    <th>Rôle</th>
+                                    <th>Dernière connexion</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in connected_users %}
+                                <tr>
+                                    <td>{{ u.username }}</td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.profile.get_role_display }}</td>
+                                    <td>{{ u.last_login|date:'d/m/Y H:i' }}</td>
+                                    <td>
+                                        {% if u.is_active %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Bloqué</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        Aucun utilisateur connecté actuellement.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Tous les utilisateurs</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Rôle</th>
+                                    <th>Statut</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in all_users %}
+                                <tr>
+                                    <td>{{ u.username }}</td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.profile.get_role_display }}</td>
+                                    <td>
+                                        {% if u.is_active %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Bloqué</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+    {% if u == request.user %}
+        <span class="text-muted">Vous</span>
+    {% else %}
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <input type="hidden" name="action" value="{% if u.is_active %}block{% else %}unblock{% endif %}">
+            <button type="submit" name="toggle_status" class="btn btn-sm {% if u.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                {% if u.is_active %}Bloquer{% else %}Débloquer{% endif %}
+            </button>
+        </form>
+        <a href="{% url 'dashboard:edit_user' u.id %}" class="btn btn-sm btn-warning">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'dashboard:delete_user' u.id %}" class="btn btn-sm btn-danger">
+            <i class="fas fa-trash"></i> Supprimer
+        </a>
+    {% endif %}
+</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        Aucun utilisateur enregistré.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="add_user" value="1">
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.role.label_tag }}
+                            {{ form.role }}
+                            {% if form.role.errors %}
+                                <div class="text-danger">{{ form.role.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.telephone.label_tag }}
+                            {{ form.telephone }}
+                            {% if form.telephone.errors %}
+                                <div class="text-danger">{{ form.telephone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.adresse.label_tag }}
+                            {{ form.adresse }}
+                            {% if form.adresse.errors %}
+                                <div class="text-danger">{{ form.adresse.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Ajouter l'utilisateur</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

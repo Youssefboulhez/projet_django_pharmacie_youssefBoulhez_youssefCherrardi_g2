@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Caisse - Pharmacie H.I.B{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Colonne de gauche : Recherche et produits -->
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <!-- Barre de recherche -->
+                    <div class="input-group mb-4">
+                        <input type="text" id="searchInput" class="form-control form-control-lg" 
+                               placeholder="🔍 Rechercher par nom ou code barre...">
+                        <button class="btn btn-primary" onclick="searchProducts()">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                    
+                    <!-- Produits populaires -->
+                    <h5 class="mb-3"><i class="fas fa-fire"></i> Produits populaires</h5>
+                    <div class="row" id="productsGrid">
+                        {% for produit in produits_populaires %}
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <div class="card h-100 product-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-capsules fa-3x text-primary mb-2"></i>
+                                    <h6 class="card-title">{{ produit.nom|truncatechars:25 }}</h6>
+                                    <p class="text-success fw-bold">{{ produit.prix_vente }} DH</p>
+                                    <button class="btn btn-sm btn-success" 
+                                            onclick="window.location.href='{% url 'ventes:ajouter' produit.id %}'">
+                                        <i class="fas fa-cart-plus"></i> Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Résultats de recherche -->
+                    <div id="searchResults" style="display: none;">
+                        <h5 class="mb-3"><i class="fas fa-search"></i> Résultats de recherche</h5>
+                        <div class="row" id="searchResultsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne de droite : Panier et total -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Vente en cours</h5>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Article</th>
+                                    <th width="100">Qté</th>
+                                    <th width="80">Total</th>
+                                    <th width="40"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartItems">
+                                {% for article in articles %}
+                                <tr>
+                                    <td>{{ article.medicament.nom|truncatechars:20 }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <a href="{% url 'ventes:retirer' article.medicament.id %}" class="btn btn-sm btn-outline-secondary">-</a>
+                                            <span class="mx-2">{{ article.quantite }}</span>
+                                            <a href="{% url 'ventes:ajouter' article.medicament.id %}" class="btn btn-sm btn-outline-secondary">+</a>
+                                        </div>
+                                    </td>
+                                    <td>{{ article.sous_total }} DH</td>
+                                    <td>
+                                        <a href="{% url 'ventes:retirer' article.medicament.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </table>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        Panier vide
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>TOTAL TTC :</strong>
+                        <h4 class="text-success">{{ total }} DH</h4>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'ventes:valider' %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle"></i> VALIDER LA VENTE
+                        </a>
+                        <a href="{% url 'ventes:panier' %}" class="btn btn-secondary">
+                            <i class="fas fa-trash-alt"></i> Voir le panier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .table-sm td, .table-sm th {
+        vertical-align: middle;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    function searchProducts() {
+        var query = document.getElementById('searchInput').value;
+        if (query.length < 2) return;
+        window.location.href = "{% url 'stock:recherche' %}?q=" + encodeURIComponent(query);
+    }
+</script>
+{% endblock %}
+{% endblock %}
